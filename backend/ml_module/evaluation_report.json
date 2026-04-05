@@ -1,0 +1,62 @@
+{
+  "config": {
+    "ops": 200,
+    "seed": 42
+  },
+  "results": {
+    "static_ext2": {
+      "success_rate": 0.5821917808219178,
+      "avg_fragmentation": 0.13865482496577983,
+      "avg_seek_distance": 0.12015184014442536,
+      "avg_utilization": 0.26274999999999993,
+      "prediction_accuracy": null,
+      "avg_ml_overhead_ms": null,
+      "create_attempts": 146,
+      "create_successes": 85,
+      "strategy_distribution": {
+        "static_ext2": 146
+      }
+    },
+    "static_contiguous": {
+      "success_rate": 0.5986394557823129,
+      "avg_fragmentation": 0.19053786844681866,
+      "avg_seek_distance": 0.1307593310859504,
+      "avg_utilization": 0.27790000000000004,
+      "prediction_accuracy": null,
+      "avg_ml_overhead_ms": null,
+      "create_attempts": 147,
+      "create_successes": 88,
+      "strategy_distribution": {
+        "static_contiguous": 147
+      }
+    },
+    "static_linked": {
+      "success_rate": 0.5821917808219178,
+      "avg_fragmentation": 0.052176517793833886,
+      "avg_seek_distance": 0.09494679403361772,
+      "avg_utilization": 0.26274999999999993,
+      "prediction_accuracy": null,
+      "avg_ml_overhead_ms": null,
+      "create_attempts": 146,
+      "create_successes": 85,
+      "strategy_distribution": {
+        "static_linked": 146
+      }
+    },
+    "ml_advised": {
+      "success_rate": 0.5782312925170068,
+      "avg_fragmentation": 0.049374825091592474,
+      "avg_seek_distance": 0.12262083623276407,
+      "avg_utilization": 0.26945,
+      "prediction_accuracy": 0.4557823129251701,
+      "avg_ml_overhead_ms": 23.574589061088304,
+      "create_attempts": 147,
+      "create_successes": 85,
+      "strategy_distribution": {
+        "Contiguous": 120,
+        "Indexed": 12,
+        "Linked": 15
+      }
+    }
+  }
+}

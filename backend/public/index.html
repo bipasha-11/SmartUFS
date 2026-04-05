@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FS Simulator</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --panel-bg: #1e293b;
+            --text-color: #e2e8f0;
+            --border-color: #334155;
+            --accent-color: #3b82f6;
+            --danger-color: #ef4444;
+            --success-color: #22c55e;
+            --block-size: 20px;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1,
+        h2 {
+            margin: 0 0 10px 0;
+        }
+
+        header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        input,
+        select,
+        button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: white;
+            font-family: inherit;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        .disk-grid {
+            display: grid;
+            grid-template-columns: repeat(20, 1fr);
+            /* 20 per row = 5 rows for 100 */
+            gap: 4px;
+        }
+
+        .block {
+            aspect-ratio: 1;
+            background-color: #334155;
+            /* Free */
+            border-radius: 2px;
+            position: relative;
+            cursor: help;
+            transition: background-color 0.2s;
+        }
+
+        .block:hover::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: black;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .block.DATA {
+            background-color: var(--accent-color);
+        }
+
+        .block.INODE_TABLE {
+            background-color: #f59e0b;
+        }
+
+        .block.BITMAP {
+            background-color: #10b981;
+        }
+
+        /* Dynamic coloring will be inline */
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-color);
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .file-item button {
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            background: transparent;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .metrics {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .metric-val {
+            font-weight: bold;
+            color: var(--success-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div>
+            <h1>FS Simulator</h1>
+            <div style="font-size: 0.9rem; color: #94a3b8;">Classical Allocated vs EXT2 Heuristics</div>
+        </div>
+        <div class="metrics" id="metrics">
+            <!-- Injected via JS -->
+        </div>
+    </header>
+
+    <main>
+        <div class="panel controls">
+            <h2>Operations</h2>
+            <div class="control-group">
+                <label>Strategy</label>
+                <select id="strategySelect">
+                    <option value="contiguous">Contiguous Allocation</option>
+                    <option value="linked">Linked Allocation</option>
+                    <option value="indexed">Indexed Allocation (Planned)</option>
+                    <option value="ext2">EXT2 (Groups/Bitmaps)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>New File Name</label>
+                <input type="text" id="fileName" placeholder="e.g. video.mp4">
+            </div>
+            <div class="control-group">
+                <label>Size (KB)</label>
+                <input type="number" id="fileSize" value="5" min="1" max="50">
+            </div>
+            <button id="allocBtn">Allocate File</button>
+            <button id="formatBtn" class="danger" style="margin-top: 10px;">Format Disk</button>
+
+            <h3 style="margin-top: 20px; font-size: 1rem;">Active Files</h3>
+            <div class="file-list" id="fileList">
+                <!-- Files -->
+            </div>
+        </div>
+
+        <div class="panel">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <h2>Virtual Disk Map</h2>
+                <div style="font-size: 0.8rem; display: flex; gap: 10px;">
+                    <span style="display:flex; align-items:center; gap:4px">
+                        <div style="width:10px; height:10px; background:#334155"></div> Free
+                    </span>
+                    <span style="display:flex; align-items:center; gap:4px">
+                        <div style="width:10px; height:10px; background:var(--accent-color)"></div> Data
+                    </span>
+                </div>
+            </div>
+            <div class="disk-grid" id="diskGrid">
+                <!-- Blocks -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API = 'http://localhost:3001/api';
+
+        // State
+        let currentState = null;
+
+        async function fetchState() {
+            try {
+                const res = await fetch(`${API}/state`);
+                currentState = await res.json();
+                render();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function createFile() {
+            const name = document.getElementById('fileName').value;
+            const size = document.getElementById('fileSize').value;
+            if (!name || !size) return alert('Name and size required');
+
+            const res = await fetch(`${API}/files`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, size: size * 1024 })
+            });
+            const data = await res.json();
+            if (!data.success) alert(data.error);
+            fetchState();
+        }
+
+        async function deleteFile(name) {
+            await fetch(`${API}/files/${name}`, { method: 'DELETE' });
+            fetchState();
+        }
+
+        async function formatDisk() {
+            await fetch(`${API}/format`, { method: 'POST' });
+            fetchState();
+        }
+
+        async function setStrategy(s) {
+            await fetch(`${API}/strategy`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ strategy: s })
+            });
+            fetchState();
+        }
+
+        // Colors
+        function getFileColor(fileId) {
+            if (fileId === null) return '#334155';
+            const hue = (fileId * 137.5) % 360;
+            return `hsl(${hue}, 70%, 50%)`;
+        }
+
+        function render() {
+            if (!currentState) return;
+
+            // Metrics
+            const total = currentState.blocks.length;
+            const used = currentState.blocks.filter(b => b.type !== 'FREE').length;
+            const util = ((used / total) * 100).toFixed(1);
+            document.getElementById('metrics').innerHTML = `
+            <div>Strategy: <span class="metric-val">${currentState.strategy}</span></div>
+            <div>Utilization: <span class="metric-val">${util}%</span></div>
+            <div>Files: <span class="metric-val">${currentState.files.length}</span></div>
+        `;
+
+            // Files
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = currentState.files.map(f => `
+            <div class="file-item">
+                <span style="color: ${getFileColor(f.id)}">█ ${f.name}</span>
+                <button onclick="deleteFile('${f.name}')">DEL</button>
+            </div>
+        `).join('');
+
+            // Disk
+            const grid = document.getElementById('diskGrid');
+            grid.innerHTML = currentState.blocks.map(b => {
+                const color = b.type === 'FREE' ? '#334155' :
+                    b.type === 'DATA' ? getFileColor(b.fileId) :
+                        b.type === 'INODE_TABLE' ? '#f59e0b' : '#10b981';
+                return `<div class="block" style="background-color: ${color}" data-title="Block ${b.id} (${b.type})"></div>`;
+            }).join('');
+
+            // update select if matches
+            // const sel = document.getElementById('strategySelect');
+            // if (sel.value !== currentState.strategy.toLowerCase() && ...) // simplistic mapping check needed
+        }
+
+        document.getElementById('allocBtn').onclick = createFile;
+        document.getElementById('formatBtn').onclick = formatDisk;
+        document.getElementById('strategySelect').onchange = (e) => setStrategy(e.target.value);
+
+        // Initial load
+        fetchState();
+        setInterval(fetchState, 2000);
+
+    </script>
+</body>
+
+</html>
