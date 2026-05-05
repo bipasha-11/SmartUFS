@@ -1,63 +1,148 @@
-# OS Project: ML-Enhanced File System Simulator
+<div align="center">
 
-This project is a comprehensive simulation of a file system (EXT2-inspired) enhanced with a Machine Learning (ML) advisory layer for dynamic allocation strategy selection.
+# 💿 SmartUFS: ML-Enhanced File System Simulator
 
-## 🚀 How to Run the Project
+**Dynamic Disk Allocation Strategy Selection using Random Forest Classifiers**
 
-### 1. Prerequisites
-- **Node.js** (v14+)
-- **Python 3.13**
-- **PowerShell** (for the automated startup script)
+[![React](https://img.shields.io/badge/Frontend-React-61DAFB?logo=react&logoColor=black)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/Backend-TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Python](https://img.shields.io/badge/ML--Core-Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Service-Flask-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-### 2. Quick Start (Windows)
-Run the following script from the project root:
-```powershell
-./run_all.ps1
+[Explore Research](https://github.com/bipasha-11/SmartUFS/tree/main/backend/ml_module) • [View Architecture](#-system-architecture) • [Setup Guide](#-getting-started)
+
+</div>
+
+---
+
+## 🌟 Overview
+
+**SmartUFS** is a next-generation file system simulator (EXT2-inspired) that bridges classical Operating System design with modern Machine Learning. While traditional file systems use static heuristics for block allocation, SmartUFS implements an **ML Advisory Layer** that dynamically hot-swaps between allocation strategies based on real-time disk state telemetry.
+
+This project was presented at the **ICTMIM 2026** conference, demonstrating a **64% reduction in disk fragmentation** compared to static baselines.
+
+---
+
+## 📸 Visual Preview
+
+| Feature Importance Analysis | Fragmentation Comparison |
+|:---:|:---:|
+| <img src="backend/ml_module/graphs/feature_importance.png" width="400" alt="Feature Importance"> | <img src="backend/ml_module/graphs/fragmentation_comparison.png" width="400" alt="Fragmentation"> |
+| **Strategy Distribution** | **Performance Metrics** |
+| <img src="backend/ml_module/graphs/ml_strategy_distribution.png" width="400" alt="Strategy Distribution"> | <img src="backend/ml_module/graphs/performance_metrics.png" width="400" alt="Performance"> |
+
+---
+
+## 🚀 Core Features
+
+- 🧠 **ML-Driven Allocation**: Uses a Random Forest classifier to predict the most efficient strategy (Contiguous, Linked, Indexed, or EXT2-like).
+- 🔄 **Dynamic Hot-Swapping**: Real-time transition between strategies without system downtime.
+- 📊 **8-Dimension Feature Extraction**: Analyzes disk state (fragmentation, block density, request size, etc.) to inform the model.
+- 🎨 **Visual Dashboard**: A React-based interface for real-time disk visualization and performance monitoring.
+- 📈 **Benchmark Framework**: Built-in tools for comparing ML performance against classical heuristics.
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    subgraph Frontend
+        A[React Dashboard] -->|API Requests| B[Express API]
+    end
+    
+    subgraph Backend
+        B -->|Telemetry Data| C[File System Manager]
+        C -->|State Vector| D[ML Advisory Layer]
+    end
+    
+    subgraph ML_Engine
+        D -->|Prediction Request| E[Flask ML Service]
+        E -->|Random Forest Inference| F[Optimized Strategy]
+        F -->|Selection| C
+    end
+    
+    C -->|Block Logic| G[(Virtual Disk)]
 ```
-This will start:
-- **ML Service**: Python/Flask (Port 5000)
-- **Backend API**: Node.js/TypeScript (Port 3001)
-- **Frontend Dashboard**: React/Vite (Port 3000)
-
-### 3. Manual Steps
-If you prefer running components separately:
-- **ML Service**: `python backend/ml_module/predictor.py`
-- **Backend**: `cd backend && npx ts-node src/index.ts`
-- **Frontend**: `cd frontend && npm run dev`
 
 ---
 
-## 🏗️ Architecture Overview
+## 💻 Tech Stack
 
-The system follows a hybrid architecture combining real-time OS simulation with predictive modeling:
-
-1. **Frontend (React)**:
-   - Real-time visualization of the 100-block disk map.
-   - Interactive control panel for file allocation and strategy selection.
-   - ML Advisory dashboard with confidence metrics and decision logs.
-
-2. **Backend (TypeScript/Express)**:
-   - Core file system logic (Inodes, Block management).
-   - Multiple allocation strategies: Contiguous, Linked, Indexed, and EXT2-like.
-   - **ML Advisory Layer**: Intercepts allocation requests, extracts disk features, and consults the ML service for the optimal strategy.
-
-3. **ML Module (Python/Flask)**:
-   - **Random Forest Model**: Trained on simulation data to predict the best strategy based on fragmentation, seek distance, and utilization.
-   - **Data Pipeline**: Tools for dataset generation (`generate_dataset.py`) and model training (`train_model.py`).
+- **Frontend**: React, Vite, Tailwind CSS, Lucide Icons.
+- **Backend**: Node.js, TypeScript, Express.
+- **ML Engine**: Python 3.13, Scikit-learn, Flask, Pandas.
+- **Tools**: PowerShell Automation, Mermaid.js.
 
 ---
 
-## 📊 Key Features Implemented
+## 🛠️ Getting Started
 
-- [x] **Dynamic Strategy Switching**: The system can hot-swap allocation logic at runtime based on ML predictions.
-- [x] **Feature Extraction**: 8-dimension feature vector captured from the disk state for every allocation.
-- [x] **Benchmark Framework**: Automated comparison between static strategies and the ML-advised approach.
-- [x] **Performance Metrics**: Real-time tracking of external fragmentation, average seek distance, and throughput.
+### Prerequisites
+- **Node.js** (v14 or higher)
+- **Python 3.13** (with `pip`)
+- **PowerShell** (for automation scripts)
+
+### Local Installation
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/bipasha-11/SmartUFS.git
+   cd SmartUFS
+   ```
+
+2. **Automated Setup (Recommended)**
+   Run the PowerShell script to install dependencies and start all services (Frontend, Backend, ML):
+   ```powershell
+   ./run_all.ps1
+   ```
+
+### Manual Configuration
+
+If you prefer starting services individually:
+
+- **ML Service (Port 5000)**:
+  ```bash
+  cd backend/ml_module
+  pip install -r requirements.txt
+  python app.py
+  ```
+
+- **Backend API (Port 3001)**:
+  ```bash
+  cd backend
+  npm install
+  npm run dev
+  ```
+
+- **Frontend (Port 3000)**:
+  ```bash
+  cd frontend
+  npm install
+  npm run dev
+  ```
 
 ---
 
-## 💾 Saved State
-The project has been stabilized with the following fixes:
-- **Fixed ML Connectivity**: Updated internal URLs to use `127.0.0.1` for reliable resolution.
-- **Cleaned Backend**: Removed redundant JS files to ensure the TypeScript source remains the source of truth.
-- **Model Ready**: The `allocation_model.pkl` is trained and ready for immediate use.
+## 📜 Research & Publications
+
+This project was developed as part of a research paper focused on intelligent storage management.
+- **Conference**: ICTMIM 2026
+- **Result**: Achieved a significant reduction in fragmentation (13.8% → 4.9%).
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! If you find a bug or want to suggest an improvement, please open an issue or submit a pull request.
+
+---
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+<div align="center">
+  Developed with ❤️ by <a href="https://github.com/bipasha-11">Bipasha Vijayanand</a>
+</div>
