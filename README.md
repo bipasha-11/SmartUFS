@@ -144,5 +144,5 @@ Contributions are welcome! If you find a bug or want to suggest an improvement, 
 Distributed under the MIT License. See `LICENSE` for more information.
 
 <div align="center">
-  Developed with ❤️ by <a href="https://github.com/bipasha-11">Bipasha Vijayanand</a>
+  Developed by <a href="https://github.com/bipasha-11">Bipasha Vijayanand</a>
 </div>
